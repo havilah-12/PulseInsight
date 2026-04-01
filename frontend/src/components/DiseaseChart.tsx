@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { Activity } from "lucide-react";
+import { apiUrl } from "../lib/api";
 
 const COLORS: string[] = ["#f87171", "#fbbf24", "#f472b6", "#a78bfa", "#60a5fa", "#22d3ee", "#34d399"];
 
@@ -15,8 +16,7 @@ const WarningChart = () => {
   const [chartData, setChartData] = useState<ParameterWarning[]>([]);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-    fetch(`${apiUrl}/parameter-distribution`)
+    fetch(apiUrl("/parameter-distribution"))
       .then((res) => res.json())
       .then((data) => {
         const coloredData = data.map((d: any, i: number) => ({

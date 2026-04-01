@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { UploadCloud } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { apiUrl } from '../lib/api';
 
 const Uploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -21,8 +22,7 @@ const Uploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     formData.append('file', file);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-      const response = await fetch(`${apiUrl}/upload`, {
+      const response = await fetch(apiUrl('/upload'), {
         method: 'POST',
         body: formData,
       });

@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: pulseinsight-backend
+    environment:
+      PORT: 5001
+      DATABASE_URL: sqlite:////app/data/pulseinsight.db
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - backend-data:/app/data
+    ports:
+      - "5001:5001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5001/healthz')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: pulseinsight-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+
+volumes:
+  backend-data:

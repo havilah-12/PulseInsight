@@ -5,6 +5,7 @@ import WarningChart from "../components/DiseaseChart"; /* Reused filename */
 import PatientList from "../components/CommentList";   /* Reused filename */
 import Uploader from "../components/Uploader";
 import { useQueryClient } from "@tanstack/react-query";
+import { apiUrl } from "../lib/api";
 
 const Index = () => {
   const queryClient = useQueryClient();
@@ -46,12 +47,12 @@ const Index = () => {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <a href={`${import.meta.env.VITE_API_URL || "http://127.0.0.1:5000"}/export-report`} download>
+                <a href={apiUrl("/export-report")} download>
                   <button className="rounded-xl border border-white/20 bg-white px-5 py-2.5 font-semibold text-indigo-700 shadow-md transition hover:bg-indigo-50">
                     Download CSV
                   </button>
                 </a>
-                <a href={`${import.meta.env.VITE_API_URL || "http://127.0.0.1:5000"}/export-report/pdf`} download>
+                <a href={apiUrl("/export-report/pdf")} download>
                   <button className="rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 font-semibold text-white shadow-md transition hover:bg-white/20">
                     Download PDF
                   </button>

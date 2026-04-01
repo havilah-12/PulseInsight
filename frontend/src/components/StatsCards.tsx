@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "../components/ui/card";
 import { TrendingUp, Users, AlertCircle, CheckCircle } from "lucide-react";
+import { apiUrl } from "../lib/api";
 
 const StatsCards = () => {
   const [statsData, setStatsData] = useState({
@@ -11,8 +12,7 @@ const StatsCards = () => {
   });
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-    fetch(`${apiUrl}/analytics-stats`)
+    fetch(apiUrl("/analytics-stats"))
       .then((res) => res.json())
       .then(setStatsData);
   }, []);

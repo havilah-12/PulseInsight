@@ -6,6 +6,7 @@ import { Activity, AlertTriangle, CheckCircle, ArrowLeft, ClipboardList, Downloa
 import Header from "../components/Header";
 import ProfileAvatar from "../components/ProfileAvatar";
 import BodyProfileGraphic from "../components/BodyProfileGraphic";
+import { apiUrl } from "../lib/api";
 
 interface Parameter {
   name: string;
@@ -30,8 +31,7 @@ const PatientReport = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-    fetch(`${apiUrl}/patients/${id}`)
+    fetch(apiUrl(`/patients/${id}`))
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();
@@ -71,7 +71,6 @@ const PatientReport = () => {
   const criticalParams = patient.parameters.filter((p) => p.status === "Critical");
   const warningParams = patient.parameters.filter((p) => p.status === "Warning");
   const actionParams = patient.parameters.filter(p => p.status !== "Good");
-  const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
 
   const groupedSections = [
     {
@@ -108,7 +107,7 @@ const PatientReport = () => {
             <ArrowLeft className="h-4 w-4" /> Back to Dashboard
           </Link>
           <a
-            href={`${apiUrl}/patients/${patient.id}/export-report/pdf`}
+            href={apiUrl(`/patients/${patient.id}/export-report/pdf`)}
             download
             className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-colors hover:bg-indigo-700"
           >

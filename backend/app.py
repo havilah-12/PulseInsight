@@ -16,20 +16,31 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 load_dotenv()
 
 DB_TYPE = os.getenv("DB_TYPE", "sqlite")
+DATABASE_URL = os.getenv("DATABASE_URL")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_SQLITE_DIR = os.path.join(BASE_DIR, "data")
+DEFAULT_SQLITE_PATH = os.path.join(DEFAULT_SQLITE_DIR, "pulseinsight.db")
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-if DB_TYPE == "postgres":
+if DATABASE_URL:
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+elif DB_TYPE == "postgres":
     POSTGRES_URL = os.getenv("POSTGRES_URL", "postgresql://postgres:postgres@localhost/lab_reports")
     app.config["SQLALCHEMY_DATABASE_URI"] = POSTGRES_URL
 else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    os.makedirs(DEFAULT_SQLITE_DIR, exist_ok=True)
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DEFAULT_SQLITE_PATH}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 with app.app_context():
     db.create_all()
+
+@app.route('/healthz', methods=['GET'])
+def healthz():
+    return jsonify({"status": "ok"}), 200
 
 def _patient_payload(patient):
     params = ParameterAnalysis.query.filter_by(patient_id=patient.id).all()
@@ -318,4 +329,7 @@ def analytics_stats():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "5001"))
+    debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
+    app.run(host=host, port=port, debug=debug)

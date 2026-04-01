@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Badge } from "../components/ui/badge";
 import { Users, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
 import ProfileAvatar from "./ProfileAvatar";
+import { apiUrl } from "../lib/api";
 
 interface Patient {
   id: number;
@@ -25,8 +26,7 @@ const PatientList = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-    fetch(`${apiUrl}/patients`)
+    fetch(apiUrl("/patients"))
       .then((res) => res.json())
       .then(setPatients)
       .finally(() => setIsLoading(false));
