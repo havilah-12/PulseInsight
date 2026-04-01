@@ -31,38 +31,36 @@ const WarningChart = () => {
 
   return (
     <div className="space-y-8">
-      {/* 📊 Overview Card */}
-      <Card className="shadow-lg border-none rounded-2xl bg-gradient-to-r from-red-50 to-orange-50">
+      <Card className="overflow-hidden rounded-[28px] border-none bg-gradient-to-r from-white to-rose-50 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center space-x-3 text-2xl font-semibold text-red-700">
-            <div className="p-2 rounded-full bg-red-100">
+            <div className="rounded-full bg-red-100 p-2">
               <Activity className="h-5 w-5 text-red-600" />
             </div>
-            <span>Warnings Distribution</span>
+            <span>Risk Snapshot</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="grid grid-cols-2 gap-6 text-center md:grid-cols-4">
             <div>
               <p className="text-3xl font-bold text-red-600">{totalWarnings}</p>
-              <p className="text-sm text-gray-500">Total Warnings</p>
+              <p className="text-sm text-gray-500">Critical + Warning</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-orange-500">{chartData.length}</p>
-              <p className="text-sm text-gray-500">Parameters Flagged</p>
+              <p className="text-sm text-gray-500">Flagged Test Types</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* 🥧 Pie Chart Card */}
-      <Card className="shadow-lg border-none rounded-2xl bg-gradient-to-br from-white to-pink-50">
+      <Card className="overflow-hidden rounded-[28px] border-none bg-gradient-to-br from-white via-pink-50 to-violet-50 shadow-lg">
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center space-x-3 text-2xl font-semibold text-pink-700">
-            <div className="p-2 rounded-full bg-pink-100">
+            <div className="rounded-full bg-pink-100 p-2">
               <Activity className="h-5 w-5 text-pink-600" />
             </div>
-            <span>Warnings by Parameter</span>
+            <span>Risk By Parameter</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="h-96">

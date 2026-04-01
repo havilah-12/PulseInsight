@@ -1,146 +1,100 @@
-# 🧬 LabReport Analyzer
+# PulseInsight
 
-LabReport Analyzer is a full-stack project that extracts disease mentions and their severity from unstructured lab report comments using NLP. It stores structured data in a PostgreSQL database and provides REST APIs for interaction.
-
----
-
-# 🌟 Features
-
-- 🧠 Disease and severity extraction using spaCy  
-- 🗃️ PostgreSQL database for structured storage  
-- ⚙️ Flask-based backend with REST API  
-- 💻 React + TypeScript frontend for visualization and interaction  
-- 🧾 SQL scripts for schema, sample data, and analytics queries  
-- 🧪 Includes unit tests using pytest  
+PulseInsight is a full-stack healthcare analytics platform for uploading lab records, classifying each test result, generating AI-assisted remarks and next-step suggestions, and exporting patient-friendly reports in CSV or PDF.
 
 ---
 
-# 🛠️ Tech Stack
+## Features
 
-- 🐍 Python (Flask)  
-- 🧬 spaCy (NLP)  
-- 🏗️ SQLAlchemy (ORM)  
-- 🐘 PostgreSQL (Database)  
-- ⚛️ React + TypeScript (Frontend)  
-- ✅ Pytest (Testing)
-- ⚡ Vite (Build Tool)
-
----
-
-# 📁 Repository Structure
-
-- `app.py` - Flask app entry point  
-- `db_schema/` - SQL files: schema, inserts, queries  
-- `semantic_analysis/` - NLP logic (spaCy + rules)  
-- `test_app.py` - Unit tests for comment API  
-- `frontend/` - React + TypeScript frontend 
-- `requirements.txt` - Python dependencies  
-- `README.md` - Project documentation  
+- AI-assisted lab test interpretation through `backend/llm_integration.py`
+- Patient profile dashboard with grouped test sections
+- Individual patient report view with React-generated body profile graphic
+- CSV upload workflow for batch patient analysis
+- CSV and PDF report exports, including per-patient PDF downloads
+- Flask REST API with SQLAlchemy persistence
+- React + TypeScript frontend powered by Vite
+- Pytest-based backend test support
 
 ---
 
-# 🚀 How to Run the Backend (Flask API)
+## Tech Stack
 
-## 🔧 Step 1: Setup Environment
-
-- Create a virtual environment:
-  - `python -m venv venv`
-  - `source venv/bin/activate` (Linux/macOS)
-  - `venv\Scripts\activate` (Windows)
-
-- Install dependencies:
-  - `pip install -r requirements.txt`
-
-## ▶️ Step 2: Run the Flask Server
-
-- Run the app:
-  - `python app.py`
-- The API will be available at:
-  - `http://127.0.0.1:5000`
-
-## 🧪 Step 3: API Testing
-
-- Use curl, Postman, or browser to test endpoints
+- Python + Flask
+- SQLAlchemy ORM
+- SQLite in-memory by default, PostgreSQL-ready configuration
+- React + TypeScript + Vite
+- Recharts, React Query, Tailwind-based UI
+- ReportLab for PDF generation
+- Pytest for tests
 
 ---
 
-# 💻 How to Run the Frontend 
+## Repository Structure
 
-## 📂 Step 1: Navigate to Frontend Directory
+- `backend/app.py` - Flask API, upload flow, analytics, CSV/PDF export
+- `backend/llm_integration.py` - AI interpretation layer for test classification
+- `backend/models.py` - patient and parameter persistence model
+- `frontend/` - React app for dashboard, upload, charts, and patient reports
+- `sample_data.csv` - sample upload dataset
+- `README.md` - project overview and run instructions
+
+---
+
+## Run The Backend
+
+- `cd backend`
+- `py -3.10 -m pip install -r requirements.txt`
+- `py -3.10 -c "from app import app; app.run(port=5001, debug=False)"`
+- Backend will run at `http://127.0.0.1:5001`
+
+---
+
+## Run The Frontend
 
 - `cd frontend`
-
-## 📦 Step 2: Install Dependencies
-
 - `npm install`
-
-## 🟢 Step 3: Start Development Server
-
-- `npm start`  
-- Open browser at: `http://localhost:5173`
+- `npm run dev`
+- Frontend will run at `http://localhost:5173`
+- The frontend is configured to call the backend at `http://127.0.0.1:5001`
 
 ---
 
-# 📡 API Endpoints
+## API Endpoints
 
-## ✏️ Comments CRUD
-
-- `GET /comments` – Retrieve all comments  
-- `POST /comments` – Create a new comment  
-- `PUT /comments/<id>` – Update an existing comment  
-- `DELETE /comments/<id>` – Delete a comment  
-
-## 📊 NLP & Analytics
-
-- `GET /disease-distribution` – Frequency of diseases  
-- `GET /analytics-stats` – Dashboard metrics  
-- `GET /comments-analytics` – Comments with NLP annotations  
+- `POST /upload` - upload a CSV and analyze patient lab tests
+- `GET /patients` - list all patient profiles with grouped test data
+- `GET /patients/<id>` - view an individual patient report payload
+- `DELETE /patients/<id>` - delete a patient profile
+- `GET /analytics-stats` - top-level dashboard statistics
+- `GET /parameter-distribution` - warning distribution by parameter
+- `GET /export-report` - download full CSV report
+- `GET /export-report/pdf` - download full PDF report
+- `GET /patients/<id>/export-report/pdf` - download individual patient PDF report
 
 ---
 
-# ✅ Validation Rules
+## AI Layer
 
-- Comment `text` must not be empty  
-- Maximum length: **250 characters**  
-- Returns HTTP `400` with error message if invalid  
-
----
-
-# 🧪 How to Run Tests
-
-- From project root:
-  - `pytest test_app.py`
-
-### 🔍 Test Cases:
-
-- Valid comment creation  
-- Rejection of invalid input (empty or too long)  
+- Located in `backend/llm_integration.py`
+- Accepts patient age plus test parameters
+- Returns:
+  - `status`: `Good`, `Warning`, or `Critical`
+  - `remarks`
+  - `suggestions`
+- Falls back to simple mock logic when no API key is available
 
 ---
 
-# 🗂️ PostgreSQL Schema
+## Run Tests
 
-- Defined in: `db_schema/schema.sql`  
-- Includes tables:
-  - `patients`  
-  - `lab_reports`  
-  - `report_items`  
-  - `comments`  
-  - `disease_analytics`
-
-- Additional SQL files:
-  - `db_schema/sample_data.sql` – Sample insertions  
-  - `db_schema/queries.sql` – Example analytical queries  
+- `cd backend`
+- `pytest test_app.py`
 
 ---
-# 📌 Notes
 
-- Flask server uses *SQLite (in-memory)* by default  
-- PostgreSQL schema is available for production setup  
-- NLP logic is implemented in semantic_analysis/ using *spaCy* and rule-based logic  
-- Frontend consumes the REST API exposed by the backend
-- Database schema in `db_schema/schema.sql` — load before running app.  
-- ORM models defined in `models.py` (SQLAlchemy). 
-- Input validation rules in `schema.py` (max 250 chars, non-empty).  
-- Unit tests in `test_app.py` (run with `pytest`).  
-- Flask entry point: `app.py`.
+## Notes
+
+- The default backend database is SQLite in-memory, so uploaded data resets when the server stops
+- For production-style usage, switch to a persistent database configuration
+- If port `5000` is blocked on your machine, the current setup uses `5001`
+- The frontend build now completes successfully with `npm run build`

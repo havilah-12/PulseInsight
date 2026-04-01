@@ -49,19 +49,20 @@ const StatsCards = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
       {stats.map((stat, index) => (
         <Card
           key={index}
-          className={`bg-gradient-to-br ${stat.gradient} text-white shadow-xl rounded-xl transition-all transform hover:scale-[1.03] hover:shadow-2xl`}
+          className={`overflow-hidden rounded-[24px] border-none bg-gradient-to-br ${stat.gradient} text-white shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl`}
         >
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+          <CardContent className="relative p-6">
+            <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+            <div className="relative flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium opacity-90">{stat.title}</p>
-                <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                <p className="text-sm font-medium uppercase tracking-[0.18em] opacity-90">{stat.title}</p>
+                <p className="mt-2 text-3xl font-bold">{stat.value}</p>
               </div>
-              <div className="bg-white/20 p-3 rounded-lg backdrop-blur-md">
+              <div className="rounded-2xl bg-white/20 p-3 backdrop-blur-md">
                 <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
               </div>
             </div>
