@@ -1,0 +1,17 @@
+{
+  "high bp": "hypertension",
+  "bp": "hypertension",
+  "sugar": "diabetes mellitus",
+  "high sugar": "diabetes mellitus",
+  "sugar problem": "diabetes mellitus",
+  "cholesterol": "hypercholesterolemia",
+  "high cholesterol": "hypercholesterolemia",
+  "breathing problem": "respiratory issue",
+  "weak liver": "liver dysfunction",
+  "liver issue": "liver dysfunction",
+  "fatty liver": "liver dysfunction",
+  "weight loss": "weight loss",
+  "weight gain": "weight gain",
+  "overweight": "obesity",
+  "underweight": "underweight"
+}

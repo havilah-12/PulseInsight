@@ -1,0 +1,16 @@
+{
+  "terms": {
+    "overweight": "obesity",
+    "obese": "obesity",
+    "swelling": "edema",
+    "rash": "skin rash"
+  },
+  "abbreviations": {
+    "sob": "shortness of breath",
+    "cp": "chest pain"
+  },
+  "synonyms": {
+    "ache": "pain",
+    "discomfort": "pain"
+  }
+}

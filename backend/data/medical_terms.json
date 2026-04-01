@@ -1,0 +1,11 @@
+{
+  "blood pressure": "hypertension",
+  "high blood pressure": "hypertension",
+  "sugar": "diabetes mellitus",
+  "blood sugar": "diabetes mellitus",
+  "high cholesterol": "hypercholesterolemia",
+  "glucose": "diabetes mellitus",
+  "heart attack": "myocardial infarction",
+  "chest pain": "chest pain",
+  "shortness of breath": "dyspnea"
+}
