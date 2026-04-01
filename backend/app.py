@@ -7,6 +7,11 @@ import os
 import io
 import csv
 import pandas as pd
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 
 load_dotenv()
 
@@ -26,42 +31,114 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+def _patient_payload(patient):
+    params = ParameterAnalysis.query.filter_by(patient_id=patient.id).all()
+    status = "positive"
+    if any(param.status in ["Warning", "Critical"] for param in params):
+        status = "warning"
+
+    return {
+        'id': patient.id,
+        'name': patient.name or f"Patient {patient.id}",
+        'age': patient.age,
+        'photo_url': patient.photo_url,
+        'status': status,
+        'parameters': [
+            {
+                "name": pr.parameter_name,
+                "value": pr.parameter_value,
+                "status": pr.status,
+                "remarks": pr.remarks,
+                "suggestions": pr.suggestions
+            }
+            for pr in params
+        ]
+    }
+
+def _build_pdf_report(patients):
+    buffer = io.BytesIO()
+    styles = getSampleStyleSheet()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    story = [
+        Paragraph("Lab Analytics Report", styles["Title"]),
+        Spacer(1, 12),
+        Paragraph(f"Profiles included: {len(patients)}", styles["Normal"]),
+        Spacer(1, 18),
+    ]
+
+    for patient in patients:
+        grouped = {"Critical": [], "Warning": [], "Good": []}
+        for parameter in patient["parameters"]:
+            grouped.setdefault(parameter["status"], []).append(parameter)
+
+        story.append(Paragraph(f'{patient["name"]} (Age: {patient["age"]})', styles["Heading2"]))
+        story.append(Paragraph(f'Profile status: {patient["status"].title()}', styles["Normal"]))
+        if patient.get("photo_url"):
+            story.append(Paragraph(f'Photo: {patient["photo_url"]}', styles["Normal"]))
+        story.append(Spacer(1, 8))
+
+        for section in ["Critical", "Warning", "Good"]:
+            tests = grouped.get(section, [])
+            if not tests:
+                continue
+
+            story.append(Paragraph(f"{section} Tests", styles["Heading3"]))
+            table_data = [["Test", "Value", "Remarks", "Suggestions"]]
+            for test in tests:
+                table_data.append([
+                    test["name"],
+                    test["value"],
+                    test["remarks"] or "-",
+                    test["suggestions"] or "-"
+                ])
+
+            table = Table(
+                table_data,
+                colWidths=[1.3 * inch, 1.0 * inch, 2.2 * inch, 2.2 * inch],
+                repeatRows=1
+            )
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#4338ca")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#f8fafc")]),
+                ("FONTSIZE", (0, 0), (-1, -1), 8),
+                ("LEADING", (0, 0), (-1, -1), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ]))
+            story.append(table)
+            story.append(Spacer(1, 12))
+
+        story.append(Spacer(1, 12))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+def _build_single_patient_pdf(patient):
+    return _build_pdf_report([patient])
+
 @app.route('/patients', methods=['GET'])
 def get_patients():
     patients = PatientRecord.query.all()
-    result = []
-    for p in patients:
-        params = ParameterAnalysis.query.filter_by(patient_id=p.id).all()
-        # Find if any parameter is a warning
-        status = "positive"
-        if any(param.status in ["Warning", "Critical"] for param in params):
-            status = "warning"
-            
-        result.append({
-            'id': p.id,
-            'name': p.name or f"Patient {p.id}",
-            'age': p.age,
-            'status': status,
-            'parameters': [{"name": pr.parameter_name, "value": pr.parameter_value, "status": pr.status, "remarks": pr.remarks, "suggestions": pr.suggestions} for pr in params]
-        })
+    result = [_patient_payload(p) for p in patients]
     return jsonify(result), 200
 
 @app.route('/patients/<int:id>', methods=['GET'])
 def get_patient(id):
     p = PatientRecord.query.get_or_404(id)
-    params = ParameterAnalysis.query.filter_by(patient_id=p.id).all()
-    status = "positive"
-    if any(param.status in ["Warning", "Critical"] for param in params):
-        status = "warning"
-        
-    result = {
-        'id': p.id,
-        'name': p.name or f"Patient {p.id}",
-        'age': p.age,
-        'status': status,
-        'parameters': [{"name": pr.parameter_name, "value": pr.parameter_value, "status": pr.status, "remarks": pr.remarks, "suggestions": pr.suggestions} for pr in params]
-    }
-    return jsonify(result), 200
+    return jsonify(_patient_payload(p)), 200
 
 @app.route('/patients/<int:id>', methods=['DELETE'])
 def delete_patient(id):
@@ -86,6 +163,7 @@ def upload_file():
             cols = [c.strip() for c in df.columns]
             name_col = next((c for c in cols if "name" in c.lower()), None)
             age_col = next((c for c in cols if "age" in c.lower()), None)
+            photo_col = next((c for c in cols if any(token in c.lower() for token in ["photo", "image", "avatar", "picture"])), None)
             
             inserted_count = 0
             for idx, row in df.iterrows():
@@ -97,14 +175,15 @@ def upload_file():
                 if name == "Unknown" and age == "Unknown" and all(pd.isna(row[c]) for c in cols if c not in [name_col, age_col]):
                     continue
                 
-                patient = PatientRecord(name=name, age=age)
+                photo_url = str(row[photo_col]).strip() if photo_col and pd.notna(row[photo_col]) else None
+                patient = PatientRecord(name=name, age=age, photo_url=photo_url or None)
                 db.session.add(patient)
                 db.session.flush() # Get ID
                 
                 # Extract parameters
                 param_dict = {}
                 for col in cols:
-                    if col == name_col or col == age_col:
+                    if col == name_col or col == age_col or col == photo_col:
                         continue
                     val = row[col]
                     if pd.notna(val) and str(val).strip() != "":
@@ -180,6 +259,33 @@ def export_report():
         mimetype='text/csv',
         as_attachment=True,
         download_name='structural_lab_report_analytics.csv'
+    )
+
+@app.route('/export-report/pdf', methods=['GET'])
+def export_report_pdf():
+    patients = PatientRecord.query.all()
+    payload = [_patient_payload(patient) for patient in patients]
+    pdf_buffer = _build_pdf_report(payload)
+
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='lab_analytics_report.pdf'
+    )
+
+@app.route('/patients/<int:id>/export-report/pdf', methods=['GET'])
+def export_single_patient_pdf(id):
+    patient = PatientRecord.query.get_or_404(id)
+    payload = _patient_payload(patient)
+    pdf_buffer = _build_single_patient_pdf(payload)
+
+    safe_name = (payload["name"] or f"patient_{id}").strip().replace(" ", "_").lower()
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'{safe_name}_lab_report.pdf'
     )
 
 @app.route("/parameter-distribution", methods=["GET"])

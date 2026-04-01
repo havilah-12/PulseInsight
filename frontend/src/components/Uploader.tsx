@@ -50,25 +50,28 @@ const Uploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   });
 
   return (
-    <div className="mb-8">
+    <div className="w-full">
       <div 
         {...getRootProps()} 
-        className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ease-in-out cursor-pointer group bg-card/40 backdrop-blur-sm
-          ${isDragActive ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-white/20 hover:border-primary/50 hover:bg-white/5'}
+        className={`group relative overflow-hidden rounded-[28px] border-2 border-dashed bg-white/80 shadow-xl backdrop-blur-sm transition-all duration-300 ease-in-out cursor-pointer
+          ${isDragActive ? 'border-primary bg-primary/10 scale-[1.02]' : 'border-indigo-100 hover:border-primary/50 hover:bg-white'}
           ${isUploading ? 'opacity-50 pointer-events-none' : ''}
         `}
       >
         <input {...getInputProps()} />
         
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent-purple/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#4f7cff]/12 via-transparent to-[#7c4dff]/12 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         
-        <div className="relative p-10 flex flex-col items-center justify-center text-center">
+        <div className="relative flex min-h-[310px] flex-col items-center justify-center p-10 text-center md:p-12">
+          <div className="mb-5 inline-flex rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-indigo-700">
+            Central Upload Hub
+          </div>
           <motion.div
             initial={{ scale: 1 }}
             animate={{ scale: isDragActive ? 1.1 : 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-lg
-              ${isDragActive ? 'bg-primary text-primary-foreground shadow-primary/50' : 'bg-white/10 text-white/70 group-hover:bg-primary/20 group-hover:text-primary'}
+            className={`mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full shadow-lg
+              ${isDragActive ? 'bg-primary text-primary-foreground shadow-primary/50' : 'bg-indigo-100 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'}
             `}
           >
             {isUploading ? (
@@ -81,12 +84,20 @@ const Uploader = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
             )}
           </motion.div>
           
-          <h3 className="text-xl font-semibold mb-2 text-foreground">
+          <h3 className="mb-2 text-2xl font-semibold text-slate-900">
             {isUploading ? 'Processing your data...' : isDragActive ? 'Drop your CSV here' : 'Upload Lab Data'}
           </h3>
-          <p className="text-sm text-muted-foreground max-w-sm">
-            Drag and drop your clinical <span className="font-semibold text-primary">.CSV</span> dataset here, or click to browse. Our NLP engine will automatically extract diseases and compute severity.
+          <p className="max-w-lg text-sm text-slate-600">
+            Drag and drop your clinical <span className="font-semibold text-indigo-600">.CSV</span> dataset here, or click to browse. PulseInsight will analyze every profile, classify each test, and generate readable report sections.
           </p>
+          <p className="mt-3 max-w-xl text-xs text-slate-500">
+            Optional CSV columns such as <span className="font-semibold">photo</span>, <span className="font-semibold">image</span>, or <span className="font-semibold">avatar</span> will be used for patient profile pictures.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
+            <span className="rounded-full bg-slate-100 px-3 py-1">Upload once</span>
+            <span className="rounded-full bg-slate-100 px-3 py-1">Patient grouping</span>
+            <span className="rounded-full bg-slate-100 px-3 py-1">PDF reports</span>
+          </div>
         </div>
       </div>
     </div>

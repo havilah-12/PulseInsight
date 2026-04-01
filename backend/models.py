@@ -7,6 +7,7 @@ class PatientRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=True)
     age = db.Column(db.String(50), nullable=True)
+    photo_url = db.Column(db.Text, nullable=True)
     
     analytics = db.relationship('ParameterAnalysis', backref='patient', lazy=True, cascade="all, delete-orphan")
 

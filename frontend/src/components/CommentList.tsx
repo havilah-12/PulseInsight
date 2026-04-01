@@ -3,12 +3,21 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Users, AlertTriangle, CheckCircle, ArrowRight } from "lucide-react";
+import ProfileAvatar from "./ProfileAvatar";
 
 interface Patient {
   id: number;
   name: string;
   age: string;
   status: string;
+  photo_url?: string | null;
+  parameters: {
+    name: string;
+    value: string;
+    status: string;
+    remarks: string;
+    suggestions: string;
+  }[];
 }
 
 const PatientList = () => {
@@ -66,39 +75,100 @@ const PatientList = () => {
         )}
 
         {patients.map((p) => {
+          const warningParams = p.parameters.filter((param) => param.status !== "Good");
+          const healthyParams = p.parameters.filter((param) => param.status === "Good");
+
           return (
             <div 
               key={p.id} 
               className="rounded-2xl border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-md transition-all duration-300 shadow-sm overflow-hidden"
             >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <h3 className="font-bold text-gray-800 text-lg sm:text-xl">
-                    {p.name}
-                  </h3>
-                  <Badge variant="secondary" className="bg-gray-100 text-gray-600 w-fit">
-                    Age: {p.age}
-                  </Badge>
-                </div>
-                
-                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                  {p.status === "warning" ? (
-                    <Badge className="bg-red-50 text-red-700 border-red-200 shadow-sm py-1 px-3">
-                      <AlertTriangle className="h-4 w-4 mr-1.5 text-red-500"/> Action Needed
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-green-50 text-green-700 border-green-200 shadow-sm py-1 px-3">
-                      <CheckCircle className="h-4 w-4 mr-1.5 text-green-500"/> Healthy Status
-                    </Badge>
-                  )}
+              <div className="flex flex-col gap-5 p-5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-4">
+                    <ProfileAvatar name={p.name} photoUrl={p.photo_url} />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                      <h3 className="font-bold text-gray-800 text-lg sm:text-xl">
+                        {p.name}
+                      </h3>
+                      <Badge variant="secondary" className="bg-gray-100 text-gray-600 w-fit">
+                        Age: {p.age}
+                      </Badge>
+                    </div>
+                  </div>
                   
-                  <Link 
-                    to={`/patient/${p.id}`} 
-                    target="_blank"
-                    className="flex items-center gap-1.5 text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg"
-                  >
-                    View Report <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                    {p.status === "warning" ? (
+                      <Badge className="bg-red-50 text-red-700 border-red-200 shadow-sm py-1 px-3">
+                        <AlertTriangle className="h-4 w-4 mr-1.5 text-red-500"/> Action Needed
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-green-50 text-green-700 border-green-200 shadow-sm py-1 px-3">
+                        <CheckCircle className="h-4 w-4 mr-1.5 text-green-500"/> Healthy Status
+                      </Badge>
+                    )}
+                    
+                    <Link 
+                      to={`/patient/${p.id}`} 
+                      target="_blank"
+                      className="flex items-center gap-1.5 text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg"
+                    >
+                      View Report <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h4 className="font-semibold text-red-800">Attention Tests</h4>
+                      <Badge className="bg-white text-red-700 border border-red-200">
+                        {warningParams.length}
+                      </Badge>
+                    </div>
+                    {warningParams.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {warningParams.map((param) => (
+                          <span
+                            key={`${p.id}-${param.name}`}
+                            className="rounded-full bg-white px-3 py-1 text-sm text-red-700 border border-red-200"
+                          >
+                            {param.name}: {param.value}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-red-700/80">No flagged tests in this profile.</p>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-green-100 bg-green-50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <h4 className="font-semibold text-green-800">Stable Tests</h4>
+                      <Badge className="bg-white text-green-700 border border-green-200">
+                        {healthyParams.length}
+                      </Badge>
+                    </div>
+                    {healthyParams.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {healthyParams.slice(0, 6).map((param) => (
+                          <span
+                            key={`${p.id}-${param.name}`}
+                            className="rounded-full bg-white px-3 py-1 text-sm text-green-700 border border-green-200"
+                          >
+                            {param.name}: {param.value}
+                          </span>
+                        ))}
+                        {healthyParams.length > 6 && (
+                          <span className="rounded-full bg-white px-3 py-1 text-sm text-green-700 border border-green-200">
+                            +{healthyParams.length - 6} more
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-green-700/80">No in-range tests recorded yet.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
