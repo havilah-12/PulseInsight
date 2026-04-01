@@ -10,3 +10,4 @@ reportlab
 werkzeug
 openai
 gunicorn==20.1.0
+setuptools
