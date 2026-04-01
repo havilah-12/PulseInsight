@@ -9,5 +9,4 @@ pandas
 reportlab
 werkzeug
 openai
-gunicorn==20.1.0
-setuptools
+gunicorn>=22.0.0
