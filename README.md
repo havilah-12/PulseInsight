@@ -3,8 +3,8 @@
 PulseInsight is a full-stack healthcare analytics platform for uploading lab records, classifying each test result, generating AI-assisted remarks and next-step suggestions, and exporting patient-friendly reports in CSV or PDF.
 
 ---
-<img width="1578" height="974" alt="image" src="https://github.com/user-attachments/assets/48a3a15a-36f8-4923-9ba4-c1a7d5ef68ab" />
 
+<img width="1883" height="985" alt="image" src="https://github.com/user-attachments/assets/402dcf69-0ced-447f-829d-0055bb1eae14" />
 
 ## Features
 
@@ -31,9 +31,11 @@ PulseInsight is a full-stack healthcare analytics platform for uploading lab rec
 
 ---
 
-<img width="1883" height="985" alt="image" src="https://github.com/user-attachments/assets/402dcf69-0ced-447f-829d-0055bb1eae14" />
+
 
 <img width="1848" height="967" alt="image" src="https://github.com/user-attachments/assets/5cb4fff7-e0c8-4af8-a310-3642823bc505" />
+
+<img width="1578" height="974" alt="image" src="https://github.com/user-attachments/assets/48a3a15a-36f8-4923-9ba4-c1a7d5ef68ab" />
 
 ## Repository Structure
 
