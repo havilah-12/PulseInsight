@@ -168,6 +168,11 @@ def upload_file():
     
     if file and file.filename.endswith('.csv'):
         try:
+            # Clear old data
+            db.session.query(ParameterAnalysis).delete()
+            db.session.query(PatientRecord).delete()
+            db.session.commit()
+
             df = pd.read_csv(file)
             
             # Identify columns
